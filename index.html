@@ -50,4 +50,133 @@
     }
     .card-back{transform:rotateY(180deg);}
     .badge{
-      position:
+      position:absolute;top:18px;left:18px;font-size:12px;padding:6px 10px;border-radius:999px;
+      background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.35);
+      color:rgba(229,231,235,0.95);
+    }
+    .badge-back{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);}
+    .card-text{font-size:26px;line-height:1.35;white-space:pre-wrap;padding:0 10px;}
+    .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+    button{
+      border:none;padding:11px 16px;border-radius:14px;
+      background:rgba(255,255,255,0.10);color:var(--text);
+      font-size:16px;cursor:pointer;border:1px solid rgba(255,255,255,0.14);
+      transition:transform .08s ease, background .15s ease;
+    }
+    button:hover{background:rgba(255,255,255,0.14);}
+    button:active{transform:translateY(1px);}
+    .footer{margin-top:18px;color:rgba(229,231,235,0.65);font-size:13px;}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🇵🇰 PK Pakistan Flash Cards</h1>
+    <p class="subtitle">Click the card to flip • Use buttons • Keyboard: ← → Space</p>
+
+    <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+    <div id="counter" class="counter"></div>
+
+    <div class="scene">
+      <div id="card" class="card">
+        <div class="card-face card-front">
+          <div class="badge">FRONT</div>
+          <div id="frontText" class="card-text"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="badge badge-back">BACK</div>
+          <div id="backText" class="card-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn">⬅ Previous</button>
+      <button id="flipBtn">🔄 Flip</button>
+      <button id="randomBtn">🎲 Random</button>
+      <button id="nextBtn">Next ➡</button>
+    </div>
+
+    <p class="footer">Made by Waqasbinhussain • Share with friends 📲</p>
+  </div>
+
+  <script>
+    const flashcards = [
+      { front: "🛑 Avoided Economic Default", back: "Despite severe crisis (2022–23), Pakistan avoided sovereign default through IMF support and international cooperation, protecting banks, imports, and savings." },
+      { front: "📉 Inflation Stabilization", back: "Inflation, which crossed crisis levels, was gradually brought under control by 2024–25 through monetary tightening and fiscal discipline." },
+      { front: "💱 Exchange Rate Stability", back: "After sharp depreciation, the rupee stabilized due to market-based reforms and improved external discipline." },
+      { front: "🏦 Foreign Reserves Recovery", back: "Foreign exchange reserves recovered from dangerously low levels, improving import cover and payment confidence." },
+      { front: "📊 Primary Fiscal Surplus", back: "A rare primary surplus was achieved, showing improved fiscal control (excluding interest costs)." },
+      { front: "🌍 IMF Long-Term Program", back: "Pakistan entered a multi-year IMF program (2024–27), improving credibility and policy continuity." },
+      { front: "⭐ Credit Rating Upgrades", back: "Global agencies improved Pakistan’s rating outlook, signaling better macro stability and confidence." },
+      { front: "💻 IT & Services Export Growth", back: "IT and freelancing exports strengthened and became a promising diversification path." },
+      { front: "📦 Import Discipline", back: "Imports were controlled during crisis years, narrowing the trade deficit and easing pressure on reserves." },
+      { front: "⚡ Solar & Energy Transition", back: "Solar adoption accelerated in homes/businesses, reducing electricity cost pressure and long-term fuel import dependency." },
+      { front: "✈️ PIA Privatization", back: "A major SOE reform step: PIA moved toward privatization after decades of losses." },
+      { front: "🧑‍🤝‍🧑 Social Protection Expansion", back: "Cash-transfer support expanded to help poor households during high inflation." },
+      { front: "🧠 Economic Resilience", back: "Pakistan absorbed global inflation, floods, and instability while keeping systems running." },
+      { front: "🌐 International Re-Engagement", back: "Re-engagement with partners restored support pathways and confidence." },
+      { front: "📌 Big Picture Success", back: "Main win: stabilization + credibility recovery + foundations for long-term reforms." },
+      { front: "⚠️ Trade Deficit Risk", back: "Imports can rise faster than exports, pressuring the external account again." },
+      { front: "⚠️ Tax System Weakness", back: "Low tax base and weak enforcement limit sustainable revenue." },
+      { front: "⚠️ Energy Sector Losses", back: "Circular debt and inefficiencies keep hurting public finances." },
+      { front: "⚠️ Climate Vulnerability", back: "Floods and climate shocks remain major macroeconomic risks." },
+      { front: "🎯 Future Target", back: "Grow exports faster than imports, expand IT/services, and reduce debt dependency." }
+    ];
+
+    let index = 0;
+
+    const card = document.getElementById("card");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+    const counter = document.getElementById("counter");
+    const progressBar = document.getElementById("progressBar");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const flipBtn = document.getElementById("flipBtn");
+    const randomBtn = document.getElementById("randomBtn");
+
+    function render() {
+      const c = flashcards[index];
+      frontText.textContent = c.front;
+      backText.textContent = c.back;
+
+      const current = index + 1;
+      const total = flashcards.length;
+      counter.textContent = `Card ${current} of ${total}`;
+      progressBar.style.width = `${(current / total) * 100}%`;
+    }
+
+    function flip() { card.classList.toggle("is-flipped"); }
+    function next() { index = (index + 1) % flashcards.length; card.classList.remove("is-flipped"); render(); }
+    function prev() { index = (index - 1 + flashcards.length) % flashcards.length; card.classList.remove("is-flipped"); render(); }
+
+    function randomCard() {
+      let newIndex = index;
+      while (flashcards.length > 1 && newIndex === index) {
+        newIndex = Math.floor(Math.random() * flashcards.length);
+      }
+      index = newIndex;
+      card.classList.remove("is-flipped");
+      render();
+    }
+
+    // Click events
+    card.addEventListener("click", flip);
+    flipBtn.addEventListener("click", flip);
+    nextBtn.addEventListener("click", next);
+    prevBtn.addEventListener("click", prev);
+    randomBtn.addEventListener("click", randomCard);
+
+    // Keyboard
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === " " || e.key === "Enter") flip();
+    });
+
+    render();
+  </script>
+</body>
+</html>
