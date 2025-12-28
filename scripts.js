@@ -4,62 +4,88 @@ const flashcards = [
   { front: "💱 Exchange Rate Stability", back: "After sharp depreciation, the rupee stabilized due to market-based reforms, IMF oversight, and improved external discipline." },
   { front: "🏦 Foreign Reserves Recovery", back: "Foreign exchange reserves recovered from dangerously low levels, improving import cover and international payment confidence." },
   { front: "📊 Primary Fiscal Surplus", back: "Pakistan achieved a rare primary surplus, meaning government revenues exceeded expenditures (excluding interest), showing improved fiscal control." },
-  { front: "🌍 IMF Long-Term Program", back: "Pakistan entered a multi-year IMF Extended Fund Facility (2024–27), restoring international credibility and policy continuity." },
-  { front: "⭐ Credit Rating Upgrades", back: "Global rating agencies upgraded Pakistan’s outlook, signaling improved macroeconomic stability and investor confidence." },
-  { front: "💻 IT & Services Export Growth", back: "IT and freelancing exports reached record highs, becoming Pakistan’s fastest-growing and most promising export sector." },
-  { front: "📦 Import Discipline", back: "Imports were controlled during crisis years, narrowing the trade deficit and reducing pressure on foreign exchange reserves." },
-  { front: "⚡ Solar & Energy Transition", back: "Rapid adoption of solar energy by households and businesses reduced electricity costs and long-term fuel import dependence." },
-  { front: "✈️ PIA Privatization", back: "After decades of losses, Pakistan International Airlines was partially privatized — a landmark structural reform." },
-  { front: "🧑‍🤝‍🧑 Social Protection Expansion", back: "Benazir Income Support Programme (BISP) coverage and payments increased, helping poor households during inflation shock." },
-  { front: "🧠 Economic Resilience", back: "Pakistan absorbed global inflation, floods, political instability, and supply shocks while keeping the financial system functional." },
-  { front: "🌐 International Re-Engagement", back: "Re-engagement with IMF, World Bank, ADB, GCC countries, and China improved Pakistan’s global economic standing." },
-  { front: "📌 Big Picture Success", back: "Pakistan’s biggest achievement was stabilizing the economy, restoring credibility, and laying foundations for long-term reform." },
+  { front: "🌍 IMF Long-Term Program", back: "Pakistan entered a multi-year IMF program (2024–27), improving credibility and policy continuity." },
+  { front: "⭐ Credit Rating Upgrades", back: "Global rating agencies upgraded Pakistan’s outlook, signaling improved macro stability and investor confidence." },
+  { front: "💻 IT & Services Export Growth", back: "IT and freelancing exports reached record highs, becoming a strong long-term growth sector." },
+  { front: "📦 Import Discipline", back: "Imports were controlled during crisis years, narrowing the trade deficit and easing pressure on reserves." },
+  { front: "⚡ Solar & Energy Transition", back: "Solar adoption accelerated in homes/businesses, reducing electricity cost pressure and long-term fuel import dependency." },
+  { front: "✈️ PIA Privatization", back: "A major SOE reform step: PIA moved toward privatization after decades of losses." },
+  { front: "🧑‍🤝‍🧑 Social Protection Expansion", back: "Cash-transfer support expanded to help poor households during high inflation." },
+  { front: "🧠 Economic Resilience", back: "Pakistan absorbed global inflation, floods, and instability while keeping financial systems running." },
+  { front: "🌐 International Re-Engagement", back: "Re-engagement with multilaterals and partners restored confidence and support pathways." },
+  { front: "📌 Big Picture Success", back: "Main win: stabilization + credibility recovery + foundations for long-term reforms." },
 
-  // Optional challenges set:
-  { front: "⚠️ Trade Deficit Risk", back: "Imports still grow faster than exports at times, keeping pressure on the balance of payments." },
-  { front: "⚠️ Tax System Weakness", back: "Low tax base and weak enforcement limit sustainable revenue growth." },
-  { front: "⚠️ Energy Sector Losses", back: "Circular debt and inefficiencies continue to burden public finances." },
-  { front: "⚠️ Climate Vulnerability", back: "Floods and climate shocks remain major economic risks." },
-  { front: "🎯 Future Target", back: "Sustain reforms, grow exports faster than imports, expand IT/services, and reduce dependency on debt." }
+  // Challenges / targets
+  { front: "⚠️ Trade Deficit Risk", back: "Imports can rise faster than exports, pressuring the external account again." },
+  { front: "⚠️ Tax System Weakness", back: "Low tax base and weak enforcement limit sustainable revenue." },
+  { front: "⚠️ Energy Sector Losses", back: "Circular debt and inefficiencies keep hurting public finances." },
+  { front: "⚠️ Climate Vulnerability", back: "Floods and climate shocks remain major macroeconomic risks." },
+  { front: "🎯 Future Target", back: "Grow exports faster than imports, expand IT/services, and reduce debt dependency." }
 ];
 
 let index = 0;
-let showingFront = true;
 
 const card = document.getElementById("card");
-const cardText = document.getElementById("cardText");
+const frontText = document.getElementById("frontText");
+const backText = document.getElementById("backText");
 const counter = document.getElementById("counter");
+const progressBar = document.getElementById("progressBar");
 
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const flipBtn = document.getElementById("flipBtn");
+const randomBtn = document.getElementById("randomBtn");
 
-function renderCard() {
-  const current = flashcards[index];
-  cardText.textContent = showingFront ? current.front : current.back;
-  counter.textContent = `Card ${index + 1} of ${flashcards.length} • ${showingFront ? "Front" : "Back"}`;
+function render() {
+  const c = flashcards[index];
+  frontText.textContent = c.front;
+  backText.textContent = c.back;
+
+  const current = index + 1;
+  const total = flashcards.length;
+  counter.textContent = `Card ${current} of ${total}`;
+
+  progressBar.style.width = `${(current / total) * 100}%`;
 }
 
-function flipCard() {
-  showingFront = !showingFront;
-  renderCard();
+function flip() {
+  card.classList.toggle("is-flipped");
 }
 
-function nextCard() {
+function next() {
   index = (index + 1) % flashcards.length;
-  showingFront = true;
-  renderCard();
+  card.classList.remove("is-flipped");
+  render();
 }
 
-function prevCard() {
+function prev() {
   index = (index - 1 + flashcards.length) % flashcards.length;
-  showingFront = true;
-  renderCard();
+  card.classList.remove("is-flipped");
+  render();
 }
 
-card.addEventListener("click", flipCard);
-flipBtn.addEventListener("click", flipCard);
-nextBtn.addEventListener("click", nextCard);
-prevBtn.addEventListener("click", prevCard);
+function randomCard() {
+  let newIndex = index;
+  while (flashcards.length > 1 && newIndex === index) {
+    newIndex = Math.floor(Math.random() * flashcards.length);
+  }
+  index = newIndex;
+  card.classList.remove("is-flipped");
+  render();
+}
 
-renderCard();
+// Buttons
+card.addEventListener("click", flip);
+flipBtn.addEventListener("click", flip);
+nextBtn.addEventListener("click", next);
+prevBtn.addEventListener("click", prev);
+randomBtn.addEventListener("click", randomCard);
+
+// Keyboard controls
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") next();
+  if (e.key === "ArrowLeft") prev();
+  if (e.key === " " || e.key === "Enter") flip();
+});
+
+render();
