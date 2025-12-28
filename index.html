@@ -3,27 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pakistan Flash Cards (Last 4 Years)</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>PK Flash Cards (Last 4 Years)</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🇵🇰 Pakistan Flash Cards (Last 4 Years)</h1>
-    <p class="hint">Click the card to flip. Use buttons to navigate.</p>
+    <div class="top">
+      <h1>🇵🇰 PK Pakistan Flash Cards</h1>
+      <p class="subtitle">Click the card to flip • Use buttons or keyboard ← → Space</p>
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div id="counter" class="counter"></div>
+    </div>
 
-    <div id="card" class="card">
-      <div id="cardText" class="card-text"></div>
+    <div class="scene">
+      <div id="card" class="card">
+        <div class="card-face card-front">
+          <div class="badge">FRONT</div>
+          <div id="frontText" class="card-text"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="badge badge-back">BACK</div>
+          <div id="backText" class="card-text"></div>
+        </div>
+      </div>
     </div>
 
     <div class="controls">
       <button id="prevBtn">⬅ Previous</button>
       <button id="flipBtn">🔄 Flip</button>
+      <button id="randomBtn">🎲 Random</button>
       <button id="nextBtn">Next ➡</button>
     </div>
 
-    <div class="counter" id="counter"></div>
+    <p class="footer">Made by Waqasbinhussain • Share with friends 📲</p>
   </div>
 
-  <script src="script.js"></script>
+  <script src="./script.js" defer></script>
 </body>
 </html>
