@@ -1,30 +1,368 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Test Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PK Flash Cards</title>
+
   <style>
-    body {
-      background: black;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding-top: 100px;
+    :root{
+      --bg1:#0f172a; --bg2:#111827;
+      --text:#e5e7eb; --muted:#a3a3a3;
+      --accent:#60a5fa; --accent2:#22c55e;
+      --card: rgba(11,18,32,0.78);
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
     }
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% 10%, #1d4ed8 0%, transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, #22c55e 0%, transparent 55%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      min-height:100vh;
+    }
+
+    .container{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 16px 40px;
+      text-align:center;
+    }
+
+    h1{
+      margin: 6px 0 6px;
+      font-size: 34px;
+      letter-spacing: .3px;
+    }
+    .subtitle{
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .topRow{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: min(860px, 95%);
+      margin: 0 auto;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      color: rgba(229,231,235,0.92);
+      font-size: 13px;
+    }
+
+    .progress-wrap{
+      width: min(860px, 95%);
+      height: 10px;
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+      margin: 12px auto 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .progress-bar{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .scene{
+      width: min(860px, 95%);
+      height: 320px;
+      margin: 18px auto 18px;
+      perspective: 1200px;
+    }
+
+    .card{
+      width:100%;
+      height:100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .6s cubic-bezier(.2,.8,.2,1);
       cursor: pointer;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .card.is-flipped{ transform: rotateY(180deg); }
+
+    .card-face{
+      position:absolute;
+      inset:0;
+      padding: 28px 26px;
+      border-radius: 22px;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      backface-visibility: hidden;
+      overflow:hidden;
+    }
+
+    .card-face::before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background: radial-gradient(circle at 20% 20%, rgba(96,165,250,0.18), transparent 45%),
+                  radial-gradient(circle at 80% 40%, rgba(34,197,94,0.14), transparent 50%);
+      filter: blur(2px);
+      pointer-events:none;
+    }
+
+    .card-back{ transform: rotateY(180deg); }
+
+    .badge{
+      position:absolute;
+      top: 16px;
+      left: 16px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(96,165,250,0.15);
+      border: 1px solid rgba(96,165,250,0.35);
+      color: rgba(229,231,235,0.95);
+      z-index: 1;
+    }
+    .badge-back{
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.35);
+    }
+
+    .card-text{
+      position: relative;
+      z-index: 1;
+      font-size: 26px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      padding: 0 10px;
+    }
+
+    .controls{
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button{
+      border:none;
+      padding: 11px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      font-size: 16px;
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,0.14);
+      transition: transform .08s ease, background .15s ease;
+      user-select:none;
+    }
+    button:hover{ background: rgba(255,255,255,0.14); }
+    button:active{ transform: translateY(1px); }
+
+    .footer{
+      margin-top: 18px;
+      color: rgba(229,231,235,0.65);
+      font-size: 13px;
+    }
+
+    @media (max-width: 520px){
+      h1{ font-size: 26px; }
+      .scene{ height: 340px; }
+      .card-text{ font-size: 21px; }
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
+    <h1>🇵🇰 PK Pakistan Flash Cards</h1>
+    <p class="subtitle">Click the card to flip • Buttons work • Keyboard: ← → Space • Mobile swipe supported</p>
 
-  <h1>✅ GitHub Pages is Working</h1>
-  <p>If you see this, HTML is loading.</p>
+    <div class="topRow">
+      <div id="counter" class="chip">Card 1</div>
+      <div id="mode" class="chip">Showing: Front</div>
+    </div>
 
-  <button onclick="alert('Button Click Working!')">
-    CLICK ME
-  </button>
+    <div class="progress-wrap">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
 
+    <div class="scene">
+      <div id="card" class="card" title="Click to flip">
+        <div class="card-face card-front">
+          <div class="badge">FRONT</div>
+          <div id="frontText" class="card-text"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="badge badge-back">BACK</div>
+          <div id="backText" class="card-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn">⬅ Previous</button>
+      <button id="flipBtn">🔄 Flip</button>
+      <button id="randomBtn">🎲 Random</button>
+      <button id="nextBtn">Next ➡</button>
+      <button id="shareBtn">📤 Share</button>
+    </div>
+
+    <p class="footer">Made by Waqasbinhussain • Share with friends 📲</p>
+  </div>
+
+  <script>
+    const flashcards = [
+      { front: "🛑 Avoided Economic Default", back: "Despite severe crisis (2022–23), Pakistan avoided sovereign default through international support and policy stabilization, protecting banks, imports, and savings." },
+      { front: "📉 Inflation Stabilization", back: "Inflation peaked during the crisis and eased by 2024–25 due to tighter monetary policy and fiscal discipline." },
+      { front: "💱 Exchange Rate Stability", back: "After heavy volatility, the rupee stabilized as external discipline improved and market confidence recovered." },
+      { front: "🏦 Foreign Reserves Recovery", back: "FX reserves recovered from critical lows, improving import cover and payment confidence." },
+      { front: "📊 Primary Fiscal Surplus", back: "A rare primary surplus was achieved, showing improved fiscal control (excluding interest costs)." },
+      { front: "🌍 IMF Long-Term Program", back: "Pakistan entered a multi-year IMF program (2024–27), improving credibility and policy continuity." },
+      { front: "⭐ Credit Rating Upgrades", back: "Credit outlook/rating upgrades signaled improved macro stability and international confidence." },
+      { front: "💻 IT & Services Export Growth", back: "IT and freelancing exports strengthened — Pakistan’s strongest diversification path." },
+      { front: "📦 Import Discipline", back: "Imports were controlled during crisis years, narrowing the trade deficit and easing pressure on reserves." },
+      { front: "⚡ Solar & Energy Transition", back: "Solar adoption accelerated in homes and businesses, reducing electricity cost pressure and long-term fuel import dependency." },
+      { front: "✈️ PIA Privatization", back: "A major SOE reform step: PIA moved toward privatization after decades of losses." },
+      { front: "🧑‍🤝‍🧑 Social Protection Expansion", back: "Cash support expanded to help poor households during high inflation." },
+      { front: "🧠 Economic Resilience", back: "Pakistan absorbed global inflation, floods, and political instability while keeping financial systems functioning." },
+      { front: "🌐 International Re-Engagement", back: "Re-engagement with partners restored confidence and support pathways." },
+      { front: "📌 Big Picture Success", back: "Main win: stabilization + credibility recovery + foundations for long-term reforms." },
+
+      { front: "⚠️ Trade Deficit Risk", back: "Imports can rise faster than exports, pressuring the external account again." },
+      { front: "⚠️ Tax System Weakness", back: "Low tax base and weak enforcement limit sustainable revenue." },
+      { front: "⚠️ Energy Sector Losses", back: "Circular debt and inefficiencies keep hurting public finances." },
+      { front: "⚠️ Climate Vulnerability", back: "Floods and climate shocks remain major macro risks." },
+      { front: "🎯 Future Target", back: "Grow exports faster than imports, expand IT/services, and reduce debt dependency." }
+    ];
+
+    let index = 0;
+    const card = document.getElementById("card");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+    const counter = document.getElementById("counter");
+    const mode = document.getElementById("mode");
+    const progressBar = document.getElementById("progressBar");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const flipBtn = document.getElementById("flipBtn");
+    const randomBtn = document.getElementById("randomBtn");
+    const shareBtn = document.getElementById("shareBtn");
+
+    function render() {
+      const c = flashcards[index];
+      frontText.textContent = c.front;
+      backText.textContent = c.back;
+
+      const current = index + 1;
+      const total = flashcards.length;
+      counter.textContent = `Card ${current} of ${total}`;
+      progressBar.style.width = `${(current / total) * 100}%`;
+
+      mode.textContent = card.classList.contains("is-flipped") ? "Showing: Back" : "Showing: Front";
+    }
+
+    function flip() {
+      card.classList.toggle("is-flipped");
+      render();
+    }
+
+    function next() {
+      index = (index + 1) % flashcards.length;
+      card.classList.remove("is-flipped");
+      render();
+    }
+
+    function prev() {
+      index = (index - 1 + flashcards.length) % flashcards.length;
+      card.classList.remove("is-flipped");
+      render();
+    }
+
+    function randomCard() {
+      let newIndex = index;
+      while (flashcards.length > 1 && newIndex === index) {
+        newIndex = Math.floor(Math.random() * flashcards.length);
+      }
+      index = newIndex;
+      card.classList.remove("is-flipped");
+      render();
+    }
+
+    // Share current card text
+    async function shareCard() {
+      const showingBack = card.classList.contains("is-flipped");
+      const c = flashcards[index];
+      const text = showingBack ? c.back : c.front;
+      const shareText = `PK Flash Card (${index+1}/${flashcards.length})\n\n${text}\n\n${location.href}`;
+
+      // Mobile share if supported
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "PK Flash Cards", text: shareText, url: location.href });
+          return;
+        } catch (e) {}
+      }
+
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert("✅ Copied! Now paste it on WhatsApp / Facebook / anywhere.");
+      } catch (e) {
+        prompt("Copy this text:", shareText);
+      }
+    }
+
+    // Click events
+    card.addEventListener("click", flip);
+    flipBtn.addEventListener("click", flip);
+    nextBtn.addEventListener("click", next);
+    prevBtn.addEventListener("click", prev);
+    randomBtn.addEventListener("click", randomCard);
+    shareBtn.addEventListener("click", shareCard);
+
+    // Keyboard
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === " " || e.key === "Enter") flip();
+    });
+
+    // Mobile swipe
+    let touchStartX = 0;
+    card.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    card.addEventListener("touchend", (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 45) {
+        dx < 0 ? next() : prev();
+      }
+    }, { passive: true });
+
+    render();
+  </script>
 </body>
 </html>
